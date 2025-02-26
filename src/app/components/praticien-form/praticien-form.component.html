@@ -1,6 +1,6 @@
 <form [formGroup]="praticienForm" (ngSubmit)="onSubmit()" class="form-container">
   <h2>Ajout d'un nouveau praticien</h2>
-  
+
   <div class="form-row">
     <mat-form-field appearance="outline">
       <mat-label>Nom</mat-label>
@@ -42,12 +42,13 @@
     </mat-error>
   </mat-form-field>
 
+  <!-- Section des spécialités avec autocomplétion et chips -->
   <mat-form-field appearance="outline" class="chip-list">
     <mat-label>Spécialités</mat-label>
     <mat-chip-grid #chipGrid aria-label="Sélection des spécialités">
       <mat-chip-row *ngFor="let specialite of selectedSpecialites"
-                  (removed)="removeSpecialite(specialite)">
-        {{specialite}}
+                    (removed)="removeSpecialite(specialite)">
+        {{ specialite }}
         <button matChipRemove [attr.aria-label]="'Supprimer ' + specialite">
           <mat-icon>cancel</mat-icon>
         </button>
@@ -62,7 +63,7 @@
            (matChipInputTokenEnd)="add($event)">
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
       <mat-option *ngFor="let specialite of filteredSpecialites | async" [value]="specialite">
-        {{specialite}}
+        {{ specialite }}
       </mat-option>
     </mat-autocomplete>
     <mat-icon matPrefix>local_hospital</mat-icon>

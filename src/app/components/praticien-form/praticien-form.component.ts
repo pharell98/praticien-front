@@ -1,16 +1,17 @@
-import { Component, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatChipsModule } from '@angular/material/chips'; // ✅ Import du module
-import { MatChipGrid, MatChipRow } from '@angular/material/chips'; // ✅ Ajout du Grid et Row
+import { MatChipsModule } from '@angular/material/chips';
+import { MatChipGrid, MatChipRow } from '@angular/material/chips';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { Observable, map, startWith } from 'rxjs';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'praticien-form',
@@ -21,8 +22,8 @@ import { ENTER, COMMA } from '@angular/cdk/keycodes';
     MatInputModule,
     MatButtonModule,
     MatCheckboxModule,
-    MatChipsModule, // ✅ Assurez-vous qu'il est bien ajouté ici
-    MatChipGrid, MatChipRow, // ✅ Ajout du Grid et Row pour `mat-chip-grid`
+    MatChipsModule,
+    MatChipGrid, MatChipRow,
     MatAutocompleteModule,
     MatFormFieldModule,
     MatIconModule
@@ -30,8 +31,9 @@ import { ENTER, COMMA } from '@angular/cdk/keycodes';
   templateUrl: './praticien-form.component.html',
   styleUrls: ['./praticien-form.component.css']
 })
-export class PraticienFormComponent {
+export class PraticienFormComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private apiService = inject(ApiService);
 
   praticienForm = this.fb.group({
     nom: ['', Validators.required],
@@ -45,23 +47,39 @@ export class PraticienFormComponent {
 
   @Output() addPraticien = new EventEmitter<any>();
 
-  // Liste des spécialités disponibles
-  specialites: string[] = ['Cardiologie', 'Dentiste', 'Généraliste', 'Ophtalmologie', 'Neurologie'];
+  // La liste des spécialités sera récupérée depuis l'API
+  specialites: string[] = [];
 
-  // Liste des spécialités sélectionnées
+  // Liste des spécialités sélectionnées par l'utilisateur
   selectedSpecialites: string[] = [];
 
   // Contrôle pour l'autocomplétion
   specialiteCtrl = this.fb.control('');
 
-  // Observable pour filtrer les spécialités
+  // Les séparateurs autorisés (Enter, virgule)
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+
+  // Observable pour filtrer les spécialités disponibles
   filteredSpecialites: Observable<string[]> = this.specialiteCtrl.valueChanges.pipe(
     startWith(''),
     map(value => this.filterSpecialites(value || ''))
   );
 
-  // Séparateurs autorisés pour ajouter une spécialité (Enter, virgule)
-  separatorKeysCodes: number[] = [ENTER, COMMA];
+  ngOnInit(): void {
+    // Récupération des spécialités depuis l'API
+    this.apiService.getSpecialites<{ data: any[] }>().subscribe(
+      response => {
+        // Conserver uniquement le nom de chaque spécialité
+        this.specialites = response.data.map(item => item.nom);
+        console.log('Spécialités récupérées:', this.specialites);
+        // Forcer la réévaluation du filtre pour mettre à jour l'autocomplétion
+        this.specialiteCtrl.setValue(this.specialiteCtrl.value);
+      },
+      error => {
+        console.error('Erreur lors de la récupération des spécialités:', error);
+      }
+    );
+  }
 
   private filterSpecialites(value: string): string[] {
     const filterValue = value.toLowerCase();
@@ -70,7 +88,7 @@ export class PraticienFormComponent {
     );
   }
 
-  // ✅ Correction de `add()`
+  // Ajoute une spécialité tapée dans l'input
   add(event: any) {
     const value = (event.value || '').trim();
     if (value && !this.selectedSpecialites.includes(value)) {
@@ -80,7 +98,7 @@ export class PraticienFormComponent {
     this.specialiteCtrl.setValue('');
   }
 
-  // ✅ Correction de `selected()`
+  // Ajoute une spécialité sélectionnée dans l'autocomplete
   selected(event: any) {
     const specialite = event.option.viewValue;
     if (specialite && !this.selectedSpecialites.includes(specialite)) {

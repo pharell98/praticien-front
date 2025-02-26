@@ -2,53 +2,29 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { StorageService } from '../storage-services/storage.service';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8000/api'; // URL de votre backend
+  // La base URL s'arrête à /api/v1/
+  private baseUrl = 'http://localhost:8080/api/v1/';
 
-  constructor(private http: HttpClient, private storageService: StorageService) {}
+  constructor(private http: HttpClient) {}
 
-  // Récupère les en-têtes avec les tokens
+  // En-têtes (sans authentification)
   private getHeaders(): HttpHeaders {
-    const token = this.storageService.getItem('token');
-    console.log(token);
-    
-    const sessionToken = this.storageService.getItem('session_token') || '';
-console.log(sessionToken);
-
-    let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-    if (sessionToken) {
-      headers = headers.set('x-session-token', sessionToken);
-    }
-
-    return headers;
+    return new HttpHeaders();
   }
 
-  // Méthode GET avec en-têtes
-  get<T>(endpoint: string): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}/${endpoint}`, { headers: this.getHeaders() })
+  // Méthode GET pour récupérer la liste des spécialités
+  getSpecialites<T>(): Observable<T> {
+    return this.http.get<T>(`${this.baseUrl}specialites`, { headers: this.getHeaders() })
       .pipe(
+        tap(response => console.log("Réponse des spécialités :", response)),
         catchError((error) => {
-          console.error("Erreur lors de la requête GET:", error);
-          return throwError(() => error);
-        })
-      );
-  }
-
-  // Méthode POST avec en-têtes
-  post<T>(endpoint: string, data: any): Observable<T> {
-    return this.http.post<T>(`${this.baseUrl}/${endpoint}`, data, { headers: this.getHeaders() })
-      .pipe(
-        catchError((error) => {
-          console.error("Erreur lors de la requête POST:", error);
+          console.error("Erreur lors de la requête GET des spécialités :", error);
           return throwError(() => error);
         })
       );

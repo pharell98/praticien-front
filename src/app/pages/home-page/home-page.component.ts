@@ -1,9 +1,11 @@
+// home-page.component.ts
 import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatChipsModule } from '@angular/material/chips';
 import { PraticienFormComponent } from '../../components/praticien-form/praticien-form.component';
 import { PraticienListComponent } from '../../components/praticien-list/praticien-list.component';
 import { ApiService } from '../../services/api.service';
-import { log } from 'node:console';
+
 export interface Praticien {
   nom: string;
   prenom: string;
@@ -18,32 +20,37 @@ export interface Praticien {
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [CommonModule, PraticienFormComponent, PraticienListComponent],
+  imports: [CommonModule, MatChipsModule, PraticienFormComponent, PraticienListComponent],
   templateUrl: './home-page.component.html',
   styleUrls: ['./home-page.component.css']
 })
 export class HomePageComponent {
-  constructor(private apiService : ApiService){}
-  // Correction du typage explicite du signal
+  constructor(private apiService: ApiService) {}
+
+  // Signal pour stocker la liste des praticiens
   praticiens: WritableSignal<Praticien[]> = signal<Praticien[]>([]);
 
-  addPraticien(praticien: Praticien) {
+  // Propriété pour stocker la liste des spécialités récupérées depuis l'API
+  specialites: any[] = [];
 
+  addPraticien(praticien: Praticien): void {
     this.praticiens.set([...this.praticiens(), praticien]);
   }
-  users = Array([]);
-  loadPraticien(){
-    this.apiService.get<{ data: any[] }>('users').subscribe(
-      response => {
-        this.users = response.data; 
-        console.log(this.users);
+
+  loadSpecialites(): void {
+    // Utilisation de getSpecialites() qui pointe vers l'endpoint "specialites"
+    this.apiService.getSpecialites<{ data: any[] }>().subscribe(
+      (response: { data: any[] }) => {
+        this.specialites = response.data;
+        console.log("Liste des spécialités :", this.specialites);
       },
-      error => {
-        console.error('Erreur de récupération des transactions:', error);
+      (error: any) => {
+        console.error('Erreur de récupération des spécialités:', error);
       }
     );
   }
-  ngOnInit() {
-    this.loadPraticien();
+
+  ngOnInit(): void {
+    this.loadSpecialites();
   }
 }
