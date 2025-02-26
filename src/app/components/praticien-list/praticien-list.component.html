@@ -1,0 +1,60 @@
+<div class="page-container">
+  <div class="praticiens-container">
+    <mat-card *ngFor="let praticien of praticiens">
+      <div class="praticien-header">
+        <h3>{{ praticien.nom }} {{ praticien.prenom }}</h3>
+        <div class="praticien-specialite" *ngIf="praticien.specialites && praticien.specialites.length">
+          {{ praticien.specialites[0] }}
+        </div>
+      </div>
+
+      <div class="praticien-content">
+        <div class="info-item">
+          <mat-icon>email</mat-icon>
+          <span class="info-label">Email:</span>
+          <span class="info-value">{{ praticien.email }}</span>
+        </div>
+
+        <div class="info-item">
+          <mat-icon>phone</mat-icon>
+          <span class="info-label">Téléphone:</span>
+          <span class="info-value">{{ praticien.telephone }}</span>
+        </div>
+
+        <div class="address-section">
+          <div class="address-title">
+            <mat-icon>place</mat-icon>
+            <span>Adresses</span>
+          </div>
+          <ul class="address-list">
+            <li *ngIf="praticien.home">Domicile</li>
+            <li *ngIf="praticien.officiel">Officiel</li>
+            <li *ngIf="praticien.office">Bureau</li>
+          </ul>
+        </div>
+
+        <div class="specialites-section" *ngIf="praticien.specialites && praticien.specialites.length > 0">
+          <div class="address-title">
+            <mat-icon>local_hospital</mat-icon>
+            <span>Spécialités</span>
+          </div>
+          <!-- Remplacement de <mat-chip-list> par <mat-chip-set> -->
+          <mat-chip-set>
+            <mat-chip *ngFor="let specialite of praticien.specialites">
+              {{ specialite }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+
+        <div class="action-buttons">
+          <button mat-stroked-button color="primary" (click)="editPraticien(praticien)">
+            <mat-icon>edit</mat-icon> Modifier
+          </button>
+          <button mat-stroked-button color="warn" (click)="deletePraticien(praticien)">
+            <mat-icon>delete</mat-icon> Supprimer
+          </button>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,161 @@
+/* Conteneur principal pour l'affichage des cartes */
+.praticiens-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  justify-content: flex-start; /* Aligne les éléments à partir de la gauche */
+}
+.page-container {
+  width: 100%;
+  max-width: 1200px; /* Ou la largeur maximale souhaitée */
+  margin: 0 auto;
+}
+
+/* Style pour chaque carte praticien */
+mat-card {
+  flex: 0 0 300px; /* Largeur fixe de 300px, ne rétrécit pas, ne grandit pas */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  margin-bottom: 0.5rem; /* Espace en bas pour s'assurer qu'il n'y a pas de collisions */
+}
+
+mat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* En-tête de la carte avec dégradé */
+.praticien-header {
+  background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+  color: white;
+  padding: 1.25rem;
+}
+
+.praticien-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.praticien-specialite {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  font-weight: 400;
+  margin-top: 5px;
+}
+
+/* Corps de la carte */
+.praticien-content {
+  padding: 1.25rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.info-item mat-icon {
+  margin-right: 10px;
+  color: #5c6bc0;
+}
+
+.info-label {
+  font-weight: 500;
+  min-width: 80px;
+  color: #546e7a;
+}
+
+.info-value {
+  flex: 1;
+}
+
+/* Style pour la liste d'adresses */
+.address-section {
+  margin: 1.25rem 0;
+}
+
+.address-title {
+  font-weight: 500;
+  color: #546e7a;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.address-title mat-icon {
+  margin-right: 10px;
+  color: #5c6bc0;
+}
+
+.address-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0.5rem 0 1rem 1.75rem;
+}
+
+.address-list li {
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.address-list li::before {
+  content: '';
+  position: absolute;
+  left: -15px;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #5c6bc0;
+}
+
+/* Style pour les puces de spécialités */
+.specialites-section {
+  margin-bottom: 1rem;
+}
+
+mat-chip-list {
+  margin-top: 0.5rem;
+}
+
+mat-chip {
+  font-size: 0.85rem;
+  background-color: #e3f2fd !important;
+  color: #1976d2 !important;
+}
+
+/* Boutons d'action */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem;
+  border-top: 1px solid #eeeeee;
+  background-color: #fafafa;
+}
+
+.action-buttons button {
+  min-width: 90px;
+}
+
+.action-buttons button:first-child {
+  margin-right: 0.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .praticiens-container {
+    justify-content: center; /* Centre les cartes sur les petits écrans */
+  }
+  
+  mat-card {
+    flex: 0 0 100%; /* Pleine largeur sur petit écran */
+    max-width: 400px; /* Limite la largeur maximale */
+  }
+}

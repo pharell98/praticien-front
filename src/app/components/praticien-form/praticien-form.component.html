@@ -1,0 +1,92 @@
+<form [formGroup]="praticienForm" (ngSubmit)="onSubmit()" class="form-container">
+  <h2>Ajout d'un nouveau praticien</h2>
+  
+  <div class="form-row">
+    <mat-form-field appearance="outline">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="nom" required>
+      <mat-icon matPrefix>person</mat-icon>
+      <mat-error *ngIf="praticienForm.get('nom')?.hasError('required')">
+        Le nom est obligatoire
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prénom</mat-label>
+      <input matInput formControlName="prenom" required>
+      <mat-icon matPrefix>person_outline</mat-icon>
+      <mat-error *ngIf="praticienForm.get('prenom')?.hasError('required')">
+        Le prénom est obligatoire
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="email" type="email" required>
+    <mat-icon matPrefix>email</mat-icon>
+    <mat-error *ngIf="praticienForm.get('email')?.hasError('required')">
+      L'email est obligatoire
+    </mat-error>
+    <mat-error *ngIf="praticienForm.get('email')?.hasError('email')">
+      Veuillez entrer une adresse email valide
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Téléphone</mat-label>
+    <input matInput formControlName="telephone" type="tel" required>
+    <mat-icon matPrefix>phone</mat-icon>
+    <mat-error *ngIf="praticienForm.get('telephone')?.hasError('required')">
+      Le numéro de téléphone est obligatoire
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="chip-list">
+    <mat-label>Spécialités</mat-label>
+    <mat-chip-grid #chipGrid aria-label="Sélection des spécialités">
+      <mat-chip-row *ngFor="let specialite of selectedSpecialites"
+                  (removed)="removeSpecialite(specialite)">
+        {{specialite}}
+        <button matChipRemove [attr.aria-label]="'Supprimer ' + specialite">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
+    </mat-chip-grid>
+    <input placeholder="Nouvelle spécialité..."
+           #specialiteInput
+           [formControl]="specialiteCtrl"
+           [matChipInputFor]="chipGrid"
+           [matAutocomplete]="auto"
+           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+           (matChipInputTokenEnd)="add($event)">
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+      <mat-option *ngFor="let specialite of filteredSpecialites | async" [value]="specialite">
+        {{specialite}}
+      </mat-option>
+    </mat-autocomplete>
+    <mat-icon matPrefix>local_hospital</mat-icon>
+  </mat-form-field>
+
+  <div class="checkbox-section">
+    <h3>Adresses disponibles</h3>
+    <div class="checkbox-group">
+      <mat-checkbox formControlName="office" color="primary">
+        <span class="checkbox-label">OFFICE</span>
+      </mat-checkbox>
+      <mat-checkbox formControlName="officiel" color="primary">
+        <span class="checkbox-label">OFFICIEL</span>
+      </mat-checkbox>
+      <mat-checkbox formControlName="home" color="primary">
+        <span class="checkbox-label">HOME</span>
+      </mat-checkbox>
+    </div>
+  </div>
+
+  <div class="button-container">
+    <button mat-raised-button color="warn" type="button">ANNULER</button>
+    <button mat-raised-button color="primary" type="submit" class="send-button" [disabled]="praticienForm.invalid">
+      <mat-icon>save</mat-icon> ENREGISTRER
+    </button>
+  </div>
+</form>
