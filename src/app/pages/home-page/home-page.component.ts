@@ -7,12 +7,13 @@ import { PraticienListComponent } from '../../components/praticien-list/praticie
 import { ApiService } from '../../services/api.service';
 
 export interface Praticien {
+  id: string; // Ajouté pour l'identification
   nom: string;
   prenom: string;
   email: string;
   telephone: string;
   specialites: any[]; // Tableau d'objets { id, nom, description } ou, lors de l'ajout, un tableau de chaînes
-  adresses?: { adresse: string, type: string }[];
+  adresses?: { adresse: string; type: string }[];
   office: boolean;
   officiel: boolean;
   home: boolean;
@@ -31,15 +32,14 @@ export class HomePageComponent {
   // Signal pour stocker la liste des praticiens
   praticiens: WritableSignal<Praticien[]> = signal<Praticien[]>([]);
 
-  // Stocke éventuellement la liste des spécialités (pour le formulaire)
+  // Stocke éventuellement la liste des spécialités disponibles (pour le formulaire)
   specialites: any[] = [];
 
-  // Lorsqu'un praticien est ajouté depuis le formulaire
   addPraticien(praticien: Praticien): void {
     this.apiService.postPraticien<{ data: any }>(praticien).subscribe(
       response => {
         console.log("Praticien ajouté :", response.data);
-        this.loadPraticiens(); // Recharge la liste après l'ajout
+        this.loadPraticiens();
       },
       error => {
         console.error("Erreur lors de l'ajout du praticien :", error);
@@ -69,6 +69,10 @@ export class HomePageComponent {
         console.error('Erreur de récupération des praticiens:', error);
       }
     );
+  }
+
+  onPraticienDeleted(id: string): void {
+    this.loadPraticiens();
   }
 
   ngOnInit(): void {

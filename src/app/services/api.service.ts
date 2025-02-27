@@ -13,7 +13,7 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  // Retourne des en-têtes (sans authentification)
+  // Retourne des en-têtes (ici sans authentification)
   private getHeaders(): HttpHeaders {
     return new HttpHeaders();
   }
@@ -49,6 +49,18 @@ export class ApiService {
         tap(response => console.log("Réponse post praticien :", response)),
         catchError((error) => {
           console.error("Erreur lors de la requête POST des praticiens :", error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  // DELETE : Supprime un praticien par son id
+  deletePraticien<T>(id: string): Observable<T> {
+    return this.http.delete<T>(`${this.baseUrl}praticiens/${id}`, { headers: this.getHeaders() })
+      .pipe(
+        tap(response => console.log("Réponse de suppression du praticien :", response)),
+        catchError((error) => {
+          console.error("Erreur lors de la suppression du praticien :", error);
           return throwError(() => error);
         })
       );
