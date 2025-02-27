@@ -1,4 +1,3 @@
-// praticien-list.component.ts (extrait modifié)
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -32,7 +31,6 @@ export class PraticienListComponent {
     return (adresses || []).some(ad => ad.type === type);
   }
 
-  // Appel de l'événement editPraticien pour notifier le parent
   edit(praticien: Praticien): void {
     this.editPraticien.emit(praticien);
   }

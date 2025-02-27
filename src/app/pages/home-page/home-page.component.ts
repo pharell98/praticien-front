@@ -1,6 +1,6 @@
-// home-page.component.ts
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { signal, WritableSignal } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { PraticienFormComponent } from '../../components/praticien-form/praticien-form.component';
 import { PraticienListComponent } from '../../components/praticien-list/praticien-list.component';
@@ -26,21 +26,17 @@ export interface Praticien {
   templateUrl: './home-page.component.html',
   styleUrls: ['./home-page.component.css']
 })
-export class HomePageComponent {
+export class HomePageComponent implements OnInit {
   constructor(private apiService: ApiService) {}
 
-  // Signal pour stocker la liste des praticiens
+  // Signal pour stocker la liste des praticiens (Angular Signals)
   praticiens: WritableSignal<Praticien[]> = signal<Praticien[]>([]);
-
-  // Stocke la liste des spécialités récupérées depuis l'API
   specialites: string[] = [];
-
-  // Stocke le praticien à modifier (mode modification)
   praticienToEdit: Praticien | null = null;
 
   addPraticien(praticien: Praticien): void {
     if (this.praticienToEdit) {
-      // Mode modification : appel PUT
+      // Mode modification (PUT)
       this.apiService.updatePraticien<{ data: any }>(praticien, this.praticienToEdit.id).subscribe(
         response => {
           console.log("Praticien mis à jour :", response.data);
@@ -54,7 +50,7 @@ export class HomePageComponent {
         }
       );
     } else {
-      // Mode ajout : appel POST
+      // Mode ajout (POST)
       this.apiService.postPraticien<{ data: any }>(praticien).subscribe(
         response => {
           console.log("Praticien ajouté :", response.data);
@@ -74,7 +70,6 @@ export class HomePageComponent {
   loadSpecialites(): void {
     this.apiService.getSpecialites<{ data: any[] }>().subscribe(
       response => {
-        // Conserver uniquement le nom de chaque spécialité
         this.specialites = response.data.map(item => item.nom);
         console.log("Liste des spécialités :", this.specialites);
       },
