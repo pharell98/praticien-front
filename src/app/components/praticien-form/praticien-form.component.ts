@@ -1,3 +1,4 @@
+// praticien-form.component.ts
 import { Component, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -47,7 +48,7 @@ export class PraticienFormComponent implements OnInit {
 
   @Output() addPraticien = new EventEmitter<any>();
 
-  // La liste des spécialités sera récupérée depuis l'API
+  // La liste des spécialités récupérées depuis l'API
   specialites: string[] = [];
 
   // Liste des spécialités sélectionnées par l'utilisateur
@@ -116,10 +117,24 @@ export class PraticienFormComponent implements OnInit {
 
   onSubmit() {
     if (this.praticienForm.valid) {
-      this.addPraticien.emit({
-        ...this.praticienForm.value,
+      const formValue = this.praticienForm.value;
+      // Construction des adresses à partir des cases cochées (avec valeurs par défaut)
+      const adresses = [];
+      if (formValue.office) { adresses.push({ adresse: "123 Rue de Paris", type: "OFFICE" }); }
+      if (formValue.home) { adresses.push({ adresse: "456 Rue de Lyon", type: "HOME" }); }
+      if (formValue.officiel) { adresses.push({ adresse: "Adresse Officiel par défaut", type: "OFFICIEL" }); }
+
+      const data = {
+        nom: formValue.nom,
+        prenom: formValue.prenom,
+        email: formValue.email,
+        telephone: formValue.telephone,
+        adresses: adresses,
         specialites: this.selectedSpecialites
-      });
+      };
+
+      // On émet l'objet formé (le parent pourra alors appeler le service POST)
+      this.addPraticien.emit(data);
       this.praticienForm.reset();
       this.selectedSpecialites = [];
     }

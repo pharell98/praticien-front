@@ -13,12 +13,12 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  // Retourne des en-têtes (ici sans authentification)
+  // Retourne des en-têtes (sans authentification)
   private getHeaders(): HttpHeaders {
     return new HttpHeaders();
   }
 
-  // Récupère la liste des spécialités
+  // GET : Récupère la liste des spécialités
   getSpecialites<T>(): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}specialites`, { headers: this.getHeaders() })
       .pipe(
@@ -30,13 +30,25 @@ export class ApiService {
       );
   }
 
-  // Récupère la liste des praticiens
+  // GET : Récupère la liste des praticiens
   getPraticiens<T>(): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}praticiens`, { headers: this.getHeaders() })
       .pipe(
         tap(response => console.log("Réponse des praticiens :", response)),
         catchError((error) => {
           console.error("Erreur lors de la requête GET des praticiens :", error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  // POST : Ajoute un praticien
+  postPraticien<T>(data: any): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}praticiens`, data, { headers: this.getHeaders() })
+      .pipe(
+        tap(response => console.log("Réponse post praticien :", response)),
+        catchError((error) => {
+          console.error("Erreur lors de la requête POST des praticiens :", error);
           return throwError(() => error);
         })
       );

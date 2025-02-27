@@ -23,18 +23,18 @@ import { Praticien } from '../../pages/home-page/home-page.component';
 export class PraticienListComponent {
   @Input() praticiens: Praticien[] = [];
 
-  // Vérifie si un praticien possède une adresse du type spécifié.
+  // Vérifie si un praticien possède une adresse d'un type donné.
   hasAddress(adresses: { type: string }[] | undefined, type: string): boolean {
     return (adresses || []).some(ad => ad.type === type);
   }
 
-  // Méthode d'édition
+  // Méthode pour l'édition
   editPraticien(praticien: Praticien): void {
     console.log('Modification du praticien : ', praticien);
     // Ajoutez ici votre logique de modification
   }
 
-  // Méthode de suppression
+  // Méthode pour la suppression
   deletePraticien(praticien: Praticien): void {
     console.log('Suppression du praticien : ', praticien);
     // Ajoutez ici votre logique de suppression

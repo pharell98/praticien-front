@@ -11,8 +11,8 @@ export interface Praticien {
   prenom: string;
   email: string;
   telephone: string;
-  specialites: any[]; // Tableau d'objets { id, nom, description }
-  adresses?: { type: string }[];
+  specialites: any[]; // Tableau d'objets { id, nom, description } ou, lors de l'ajout, un tableau de chaînes
+  adresses?: { adresse: string, type: string }[];
   office: boolean;
   officiel: boolean;
   home: boolean;
@@ -31,11 +31,20 @@ export class HomePageComponent {
   // Signal pour stocker la liste des praticiens
   praticiens: WritableSignal<Praticien[]> = signal<Praticien[]>([]);
 
-  // Optionnel : stockage des spécialités disponibles (pour le formulaire)
+  // Stocke éventuellement la liste des spécialités (pour le formulaire)
   specialites: any[] = [];
 
+  // Lorsqu'un praticien est ajouté depuis le formulaire
   addPraticien(praticien: Praticien): void {
-    this.praticiens.set([...this.praticiens(), praticien]);
+    this.apiService.postPraticien<{ data: any }>(praticien).subscribe(
+      response => {
+        console.log("Praticien ajouté :", response.data);
+        this.loadPraticiens(); // Recharge la liste après l'ajout
+      },
+      error => {
+        console.error("Erreur lors de l'ajout du praticien :", error);
+      }
+    );
   }
 
   loadSpecialites(): void {
