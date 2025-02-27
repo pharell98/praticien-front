@@ -1,5 +1,5 @@
 <!-- home-page.component.html -->
 <div class="container">
   <praticien-form (addPraticien)="addPraticien($event)"></praticien-form>
-  <praticien-list [praticiens]="praticiens()"></praticien-list>
+  <praticien-list [praticiens]="praticiens()" (praticienDeleted)="onPraticienDeleted($event)"></praticien-list>
 </div>

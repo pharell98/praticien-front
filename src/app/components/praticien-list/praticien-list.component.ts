@@ -32,22 +32,25 @@ export class PraticienListComponent {
     return (adresses || []).some(ad => ad.type === type);
   }
 
-  // Méthode pour l'édition
+  // Méthode pour l'édition (inchangée)
   editPraticien(praticien: Praticien): void {
     console.log('Modification du praticien : ', praticien);
     // Ajoutez ici votre logique de modification
   }
 
-  // Appel à l'API pour supprimer le praticien et émettre l'id supprimé
+  // Méthode pour la suppression avec confirmation et recharge
   deletePraticien(praticien: Praticien): void {
-    this.apiService.deletePraticien(praticien.id).subscribe(
-      response => {
-        console.log("Praticien supprimé :", response);
-        this.praticienDeleted.emit(praticien.id);
-      },
-      error => {
-        console.error("Erreur lors de la suppression du praticien :", error);
-      }
-    );
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce praticien ?')) {
+      this.apiService.deletePraticien(praticien.id).subscribe(
+        response => {
+          console.log("Praticien supprimé :", response);
+          // Notifie le parent afin de recharger la liste des praticiens
+          this.praticienDeleted.emit(praticien.id);
+        },
+        error => {
+          console.error("Erreur lors de la suppression du praticien :", error);
+        }
+      );
+    }
   }
 }
