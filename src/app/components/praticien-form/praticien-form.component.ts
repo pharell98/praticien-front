@@ -58,7 +58,6 @@ export class PraticienFormComponent implements OnInit, OnChanges {
   );
 
   ngOnInit(): void {
-    // Forcer l'initialisation du filtre
     this.specialiteCtrl.setValue(this.specialiteCtrl.value);
   }
 
@@ -79,7 +78,6 @@ export class PraticienFormComponent implements OnInit, OnChanges {
         home: hasHome
       });
 
-      // Si les spécialités sont des objets avec propriété "nom"
       this.selectedSpecialites = this.praticienToEdit.specialites.map(s => s.nom || s);
     }
     if (changes['specialites']) {

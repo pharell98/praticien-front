@@ -39,11 +39,9 @@ export class PraticienListComponent {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce praticien ?')) {
       this.apiService.deletePraticien(praticien.id).subscribe(
         response => {
-          console.log("Praticien supprimé :", response);
           this.praticienDeleted.emit(praticien.id);
         },
         error => {
-          console.error("Erreur lors de la suppression du praticien :", error);
         }
       );
     }

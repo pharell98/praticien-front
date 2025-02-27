@@ -29,35 +29,28 @@ export interface Praticien {
 export class HomePageComponent implements OnInit {
   constructor(private apiService: ApiService) {}
 
-  // Signal pour stocker la liste des praticiens (Angular Signals)
   praticiens: WritableSignal<Praticien[]> = signal<Praticien[]>([]);
   specialites: string[] = [];
   praticienToEdit: Praticien | null = null;
 
   addPraticien(praticien: Praticien): void {
     if (this.praticienToEdit) {
-      // Mode modification (PUT)
       this.apiService.updatePraticien<{ data: any }>(praticien, this.praticienToEdit.id).subscribe(
         response => {
-          console.log("Praticien mis à jour :", response.data);
           this.praticiens.set(
             this.praticiens().map(p => p.id === this.praticienToEdit!.id ? response.data : p)
           );
           this.praticienToEdit = null;
         },
         error => {
-          console.error("Erreur lors de la mise à jour du praticien :", error);
         }
       );
     } else {
-      // Mode ajout (POST)
       this.apiService.postPraticien<{ data: any }>(praticien).subscribe(
         response => {
-          console.log("Praticien ajouté :", response.data);
           this.praticiens.set([...this.praticiens(), response.data]);
         },
         error => {
-          console.error("Erreur lors de l'ajout du praticien :", error);
         }
       );
     }
@@ -71,10 +64,8 @@ export class HomePageComponent implements OnInit {
     this.apiService.getSpecialites<{ data: any[] }>().subscribe(
       response => {
         this.specialites = response.data.map(item => item.nom);
-        console.log("Liste des spécialités :", this.specialites);
       },
       error => {
-        console.error('Erreur de récupération des spécialités:', error);
       }
     );
   }
@@ -83,10 +74,8 @@ export class HomePageComponent implements OnInit {
     this.apiService.getPraticiens<{ data: any[] }>().subscribe(
       response => {
         this.praticiens.set(response.data);
-        console.log("Liste des praticiens :", response.data);
       },
       error => {
-        console.error('Erreur de récupération des praticiens:', error);
       }
     );
   }

@@ -18,9 +18,7 @@ export class ApiService {
   getSpecialites<T>(): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}specialites`, { headers: this.getHeaders() })
       .pipe(
-        tap(response => console.log("Réponse des spécialités :", response)),
         catchError((error) => {
-          console.error("Erreur lors de la requête GET des spécialités :", error);
           return throwError(() => error);
         })
       );
@@ -29,9 +27,7 @@ export class ApiService {
   getPraticiens<T>(): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}praticiens`, { headers: this.getHeaders() })
       .pipe(
-        tap(response => console.log("Réponse des praticiens :", response)),
         catchError((error) => {
-          console.error("Erreur lors de la requête GET des praticiens :", error);
           return throwError(() => error);
         })
       );
@@ -40,9 +36,7 @@ export class ApiService {
   postPraticien<T>(data: any): Observable<T> {
     return this.http.post<T>(`${this.baseUrl}praticiens`, data, { headers: this.getHeaders() })
       .pipe(
-        tap(response => console.log("Réponse post praticien :", response)),
         catchError((error) => {
-          console.error("Erreur lors de la requête POST des praticiens :", error);
           return throwError(() => error);
         })
       );
@@ -51,9 +45,7 @@ export class ApiService {
   updatePraticien<T>(data: any, id: string): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}praticiens/${id}`, data, { headers: this.getHeaders() })
       .pipe(
-        tap(response => console.log("Réponse mise à jour praticien :", response)),
         catchError((error) => {
-          console.error("Erreur lors de la requête PUT des praticiens :", error);
           return throwError(() => error);
         })
       );
@@ -62,9 +54,7 @@ export class ApiService {
   deletePraticien<T>(id: string): Observable<T> {
     return this.http.delete<T>(`${this.baseUrl}praticiens/${id}`, { headers: this.getHeaders() })
       .pipe(
-        tap(response => console.log("Réponse de suppression du praticien :", response)),
         catchError((error) => {
-          console.error("Erreur lors de la suppression du praticien :", error);
           return throwError(() => error);
         })
       );
