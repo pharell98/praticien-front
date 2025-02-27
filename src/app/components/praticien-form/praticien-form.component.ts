@@ -1,4 +1,3 @@
-// praticien-form.component.ts
 import { Component, Output, EventEmitter, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -36,6 +35,7 @@ import { Praticien } from '../../pages/home-page/home-page.component';
 export class PraticienFormComponent implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
 
+  // Notre formulaire, avec des booléens pour les adresses
   praticienForm = this.fb.group({
     nom: ['', Validators.required],
     prenom: ['', Validators.required],
@@ -48,22 +48,22 @@ export class PraticienFormComponent implements OnInit, OnChanges {
 
   @Output() addPraticien = new EventEmitter<any>();
 
-  // Input pour recevoir le praticien à modifier
+  // Praticien à modifier (mode édition)
   @Input() praticienToEdit: Praticien | null = null;
 
-  // Input pour recevoir la liste des spécialités depuis le parent
+  // Liste des spécialités passées par le parent
   @Input() specialites: string[] = [];
 
-  // Liste des spécialités sélectionnées par l'utilisateur
+  // Liste des spécialités sélectionnées (pour l'autocomplétion + chips)
   selectedSpecialites: string[] = [];
 
   // Contrôle pour l'autocomplétion
   specialiteCtrl = this.fb.control('');
 
-  // Les séparateurs autorisés (Enter, virgule)
+  // Séparateurs autorisés (Enter, virgule)
   separatorKeysCodes: number[] = [ENTER, COMMA];
 
-  // Observable pour filtrer les spécialités disponibles
+  // Observable pour filtrer les spécialités
   filteredSpecialites: Observable<string[]> = this.specialiteCtrl.valueChanges.pipe(
     startWith(''),
     map(value => this.filterSpecialites(value || ''))
@@ -75,21 +75,31 @@ export class PraticienFormComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Si le praticien à modifier change, pré-remplir le formulaire
+    // Si on passe en mode édition (praticienToEdit défini)
     if (changes['praticienToEdit'] && this.praticienToEdit) {
+      // Extraire le tableau d'adresses
+      const adresses = this.praticienToEdit.adresses || [];
+      // Vérifier la présence de chaque type
+      const hasOffice = adresses.some(ad => ad.type === 'OFFICE');
+      const hasHome = adresses.some(ad => ad.type === 'HOME');
+      const hasOfficiel = adresses.some(ad => ad.type === 'OFFICIEL');
+
+      // Pré-remplir le formulaire
       this.praticienForm.patchValue({
         nom: this.praticienToEdit.nom,
         prenom: this.praticienToEdit.prenom,
         email: this.praticienToEdit.email,
         telephone: this.praticienToEdit.telephone,
-        office: this.praticienToEdit.office,
-        officiel: this.praticienToEdit.officiel,
-        home: this.praticienToEdit.home
+        office: hasOffice,
+        officiel: hasOfficiel,
+        home: hasHome
       });
-      // On suppose ici que les spécialités sont un tableau d'objets avec propriété "nom"
+
+      // Gérer les spécialités (ex. si c'est un tableau d'objets { nom: "..." })
       this.selectedSpecialites = this.praticienToEdit.specialites.map(s => s.nom || s);
     }
-    // Si la liste des spécialités (Input) change, forcer la réévaluation du filtre
+
+    // Si la liste des spécialités a changé, on relance le filtre
     if (changes['specialites']) {
       this.specialiteCtrl.setValue(this.specialiteCtrl.value);
     }
@@ -98,11 +108,12 @@ export class PraticienFormComponent implements OnInit, OnChanges {
   private filterSpecialites(value: string): string[] {
     const filterValue = value.toLowerCase();
     return this.specialites.filter(specialite =>
-      specialite.toLowerCase().includes(filterValue) && !this.selectedSpecialites.includes(specialite)
+      specialite.toLowerCase().includes(filterValue) &&
+      !this.selectedSpecialites.includes(specialite)
     );
   }
 
-  // Ajoute une spécialité tapée dans l'input
+  // Ajoute une spécialité via la saisie (tokenEnd)
   add(event: any) {
     const value = (event.value || '').trim();
     if (value && !this.selectedSpecialites.includes(value)) {
@@ -121,6 +132,7 @@ export class PraticienFormComponent implements OnInit, OnChanges {
     this.specialiteCtrl.setValue('');
   }
 
+  // Supprime une spécialité d'un chip
   removeSpecialite(specialite: string) {
     const index = this.selectedSpecialites.indexOf(specialite);
     if (index >= 0) {
@@ -128,14 +140,24 @@ export class PraticienFormComponent implements OnInit, OnChanges {
     }
   }
 
+  // Soumission du formulaire (ajout ou modification)
   onSubmit() {
     if (this.praticienForm.valid) {
       const formValue = this.praticienForm.value;
-      const adresses = [];
-      if (formValue.office) { adresses.push({ adresse: "123 Rue de Paris", type: "OFFICE" }); }
-      if (formValue.home) { adresses.push({ adresse: "456 Rue de Lyon", type: "HOME" }); }
-      if (formValue.officiel) { adresses.push({ adresse: "Adresse Officiel par défaut", type: "OFFICIEL" }); }
 
+      // Construction du tableau d'adresses en fonction des cases cochées
+      const adresses = [];
+      if (formValue.office) {
+        adresses.push({ adresse: "123 Rue de Paris", type: "OFFICE" });
+      }
+      if (formValue.home) {
+        adresses.push({ adresse: "456 Rue de Lyon", type: "HOME" });
+      }
+      if (formValue.officiel) {
+        adresses.push({ adresse: "Adresse Officiel par défaut", type: "OFFICIEL" });
+      }
+
+      // On émet l'objet complet
       const data = {
         nom: formValue.nom,
         prenom: formValue.prenom,
@@ -146,6 +168,8 @@ export class PraticienFormComponent implements OnInit, OnChanges {
       };
 
       this.addPraticien.emit(data);
+
+      // Réinitialisation du formulaire et du tableau de spécialités
       this.praticienForm.reset();
       this.selectedSpecialites = [];
     }
