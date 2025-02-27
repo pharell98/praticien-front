@@ -11,7 +11,8 @@ export interface Praticien {
   prenom: string;
   email: string;
   telephone: string;
-  specialites: string[];
+  specialites: any[]; // Tableau d'objets { id, nom, description }
+  adresses?: { type: string }[];
   office: boolean;
   officiel: boolean;
   home: boolean;
@@ -30,7 +31,7 @@ export class HomePageComponent {
   // Signal pour stocker la liste des praticiens
   praticiens: WritableSignal<Praticien[]> = signal<Praticien[]>([]);
 
-  // Propriété pour stocker la liste des spécialités récupérées depuis l'API
+  // Optionnel : stockage des spécialités disponibles (pour le formulaire)
   specialites: any[] = [];
 
   addPraticien(praticien: Praticien): void {
@@ -38,7 +39,6 @@ export class HomePageComponent {
   }
 
   loadSpecialites(): void {
-    // Utilisation de getSpecialites() qui pointe vers l'endpoint "specialites"
     this.apiService.getSpecialites<{ data: any[] }>().subscribe(
       (response: { data: any[] }) => {
         this.specialites = response.data;
@@ -50,7 +50,20 @@ export class HomePageComponent {
     );
   }
 
+  loadPraticiens(): void {
+    this.apiService.getPraticiens<{ data: any[] }>().subscribe(
+      (response: { data: any[] }) => {
+        this.praticiens.set(response.data);
+        console.log("Liste des praticiens :", response.data);
+      },
+      (error: any) => {
+        console.error('Erreur de récupération des praticiens:', error);
+      }
+    );
+  }
+
   ngOnInit(): void {
     this.loadSpecialites();
+    this.loadPraticiens();
   }
 }

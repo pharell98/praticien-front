@@ -1,10 +1,11 @@
+<!-- praticien-list.component.html -->
 <div class="page-container">
   <div class="praticiens-container">
     <mat-card *ngFor="let praticien of praticiens">
       <div class="praticien-header">
         <h3>{{ praticien.nom }} {{ praticien.prenom }}</h3>
         <div class="praticien-specialite" *ngIf="praticien.specialites && praticien.specialites.length">
-          {{ praticien.specialites[0] }}
+          {{ praticien.specialites[0]?.nom }}
         </div>
       </div>
 
@@ -27,9 +28,9 @@
             <span>Adresses</span>
           </div>
           <ul class="address-list">
-            <li *ngIf="praticien.home">Domicile</li>
-            <li *ngIf="praticien.officiel">Officiel</li>
-            <li *ngIf="praticien.office">Bureau</li>
+            <li *ngIf="hasAddress(praticien.adresses, 'HOME')">Domicile</li>
+            <li *ngIf="hasAddress(praticien.adresses, 'OFFICE')">Bureau</li>
+            <li *ngIf="hasAddress(praticien.adresses, 'OFFICIEL')">Officiel</li>
           </ul>
         </div>
 
@@ -38,10 +39,10 @@
             <mat-icon>local_hospital</mat-icon>
             <span>Spécialités</span>
           </div>
-          <!-- Remplacement de <mat-chip-list> par <mat-chip-set> -->
+          <!-- Affichage des spécialités via mat-chip-set -->
           <mat-chip-set>
             <mat-chip *ngFor="let specialite of praticien.specialites">
-              {{ specialite }}
+              {{ specialite.nom }}
             </mat-chip>
           </mat-chip-set>
         </div>

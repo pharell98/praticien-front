@@ -1,3 +1,4 @@
+// praticien-list.component.ts
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -22,13 +23,18 @@ import { Praticien } from '../../pages/home-page/home-page.component';
 export class PraticienListComponent {
   @Input() praticiens: Praticien[] = [];
 
-  // Méthode pour l'édition
+  // Vérifie si un praticien possède une adresse du type spécifié.
+  hasAddress(adresses: { type: string }[] | undefined, type: string): boolean {
+    return (adresses || []).some(ad => ad.type === type);
+  }
+
+  // Méthode d'édition
   editPraticien(praticien: Praticien): void {
     console.log('Modification du praticien : ', praticien);
     // Ajoutez ici votre logique de modification
   }
 
-  // Méthode pour la suppression
+  // Méthode de suppression
   deletePraticien(praticien: Praticien): void {
     console.log('Suppression du praticien : ', praticien);
     // Ajoutez ici votre logique de suppression
