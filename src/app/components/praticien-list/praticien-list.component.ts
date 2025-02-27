@@ -1,4 +1,4 @@
-// praticien-list.component.ts
+// praticien-list.component.ts (extrait modifié)
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -24,27 +24,24 @@ import { Praticien } from '../../pages/home-page/home-page.component';
 export class PraticienListComponent {
   @Input() praticiens: Praticien[] = [];
   @Output() praticienDeleted = new EventEmitter<string>();
+  @Output() editPraticien = new EventEmitter<Praticien>();
 
   private apiService = inject(ApiService);
 
-  // Vérifie si un praticien possède une adresse d'un type donné.
   hasAddress(adresses: { type: string }[] | undefined, type: string): boolean {
     return (adresses || []).some(ad => ad.type === type);
   }
 
-  // Méthode pour l'édition (inchangée)
-  editPraticien(praticien: Praticien): void {
-    console.log('Modification du praticien : ', praticien);
-    // Ajoutez ici votre logique de modification
+  // Appel de l'événement editPraticien pour notifier le parent
+  edit(praticien: Praticien): void {
+    this.editPraticien.emit(praticien);
   }
 
-  // Méthode pour la suppression avec confirmation et recharge
   deletePraticien(praticien: Praticien): void {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce praticien ?')) {
       this.apiService.deletePraticien(praticien.id).subscribe(
         response => {
           console.log("Praticien supprimé :", response);
-          // Notifie le parent afin de recharger la liste des praticiens
           this.praticienDeleted.emit(praticien.id);
         },
         error => {

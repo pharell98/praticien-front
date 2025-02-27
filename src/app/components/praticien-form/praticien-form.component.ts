@@ -1,5 +1,5 @@
 // praticien-form.component.ts
-import { Component, Output, EventEmitter, inject, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { Observable, map, startWith } from 'rxjs';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import { ApiService } from '../../services/api.service';
+import { Praticien } from '../../pages/home-page/home-page.component';
 
 @Component({
   selector: 'praticien-form',
@@ -32,7 +33,7 @@ import { ApiService } from '../../services/api.service';
   templateUrl: './praticien-form.component.html',
   styleUrls: ['./praticien-form.component.css']
 })
-export class PraticienFormComponent implements OnInit {
+export class PraticienFormComponent implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
   private apiService = inject(ApiService);
 
@@ -47,6 +48,9 @@ export class PraticienFormComponent implements OnInit {
   });
 
   @Output() addPraticien = new EventEmitter<any>();
+
+  // Input pour recevoir un praticien à modifier
+  @Input() praticienToEdit: Praticien | null = null;
 
   // La liste des spécialités récupérées depuis l'API
   specialites: string[] = [];
@@ -70,16 +74,31 @@ export class PraticienFormComponent implements OnInit {
     // Récupération des spécialités depuis l'API
     this.apiService.getSpecialites<{ data: any[] }>().subscribe(
       response => {
-        // Conserver uniquement le nom de chaque spécialité
         this.specialites = response.data.map(item => item.nom);
         console.log('Spécialités récupérées:', this.specialites);
-        // Forcer la réévaluation du filtre pour mettre à jour l'autocomplétion
         this.specialiteCtrl.setValue(this.specialiteCtrl.value);
       },
       error => {
         console.error('Erreur lors de la récupération des spécialités:', error);
       }
     );
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['praticienToEdit'] && this.praticienToEdit) {
+      // Pré-remplissage du formulaire avec les données du praticien à modifier
+      this.praticienForm.patchValue({
+        nom: this.praticienToEdit.nom,
+        prenom: this.praticienToEdit.prenom,
+        email: this.praticienToEdit.email,
+        telephone: this.praticienToEdit.telephone,
+        office: this.praticienToEdit.office,
+        officiel: this.praticienToEdit.officiel,
+        home: this.praticienToEdit.home
+      });
+      // Pour les spécialités, on suppose ici que c'est un tableau de chaînes
+      this.selectedSpecialites = [...this.praticienToEdit.specialites.map((s: any) => s.nom || s)];
+    }
   }
 
   private filterSpecialites(value: string): string[] {
@@ -89,7 +108,6 @@ export class PraticienFormComponent implements OnInit {
     );
   }
 
-  // Ajoute une spécialité tapée dans l'input
   add(event: any) {
     const value = (event.value || '').trim();
     if (value && !this.selectedSpecialites.includes(value)) {
@@ -99,7 +117,6 @@ export class PraticienFormComponent implements OnInit {
     this.specialiteCtrl.setValue('');
   }
 
-  // Ajoute une spécialité sélectionnée dans l'autocomplete
   selected(event: any) {
     const specialite = event.option.viewValue;
     if (specialite && !this.selectedSpecialites.includes(specialite)) {
@@ -118,7 +135,6 @@ export class PraticienFormComponent implements OnInit {
   onSubmit() {
     if (this.praticienForm.valid) {
       const formValue = this.praticienForm.value;
-      // Construction des adresses à partir des cases cochées (avec valeurs par défaut)
       const adresses = [];
       if (formValue.office) { adresses.push({ adresse: "123 Rue de Paris", type: "OFFICE" }); }
       if (formValue.home) { adresses.push({ adresse: "456 Rue de Lyon", type: "HOME" }); }
@@ -133,7 +149,6 @@ export class PraticienFormComponent implements OnInit {
         specialites: this.selectedSpecialites
       };
 
-      // On émet l'objet formé (le parent pourra alors appeler le service POST)
       this.addPraticien.emit(data);
       this.praticienForm.reset();
       this.selectedSpecialites = [];

@@ -1,5 +1,5 @@
 <form [formGroup]="praticienForm" (ngSubmit)="onSubmit()" class="form-container">
-  <h2>Ajout d'un nouveau praticien</h2>
+  <h2>{{ praticienToEdit ? 'Modification du praticien' : "Ajout d'un nouveau praticien" }}</h2>
 
   <div class="form-row">
     <mat-form-field appearance="outline">
@@ -46,8 +46,7 @@
   <mat-form-field appearance="outline" class="chip-list">
     <mat-label>Spécialités</mat-label>
     <mat-chip-grid #chipGrid aria-label="Sélection des spécialités">
-      <mat-chip-row *ngFor="let specialite of selectedSpecialites"
-                    (removed)="removeSpecialite(specialite)">
+      <mat-chip-row *ngFor="let specialite of selectedSpecialites" (removed)="removeSpecialite(specialite)">
         {{ specialite }}
         <button matChipRemove [attr.aria-label]="'Supprimer ' + specialite">
           <mat-icon>cancel</mat-icon>
@@ -87,7 +86,7 @@
   <div class="button-container">
     <button mat-raised-button color="warn" type="button">ANNULER</button>
     <button mat-raised-button color="primary" type="submit" class="send-button" [disabled]="praticienForm.invalid">
-      <mat-icon>save</mat-icon> ENREGISTRER
+      <mat-icon>save</mat-icon> {{ praticienToEdit ? 'MODIFIER' : 'ENREGISTRER' }}
     </button>
   </div>
 </form>
