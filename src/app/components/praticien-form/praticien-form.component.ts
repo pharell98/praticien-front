@@ -35,7 +35,6 @@ import { Praticien } from '../../pages/home-page/home-page.component';
 })
 export class PraticienFormComponent implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
-  private apiService = inject(ApiService);
 
   praticienForm = this.fb.group({
     nom: ['', Validators.required],
@@ -49,11 +48,11 @@ export class PraticienFormComponent implements OnInit, OnChanges {
 
   @Output() addPraticien = new EventEmitter<any>();
 
-  // Input pour recevoir un praticien à modifier
+  // Input pour recevoir le praticien à modifier
   @Input() praticienToEdit: Praticien | null = null;
 
-  // La liste des spécialités récupérées depuis l'API
-  specialites: string[] = [];
+  // Input pour recevoir la liste des spécialités depuis le parent
+  @Input() specialites: string[] = [];
 
   // Liste des spécialités sélectionnées par l'utilisateur
   selectedSpecialites: string[] = [];
@@ -71,22 +70,13 @@ export class PraticienFormComponent implements OnInit, OnChanges {
   );
 
   ngOnInit(): void {
-    // Récupération des spécialités depuis l'API
-    this.apiService.getSpecialites<{ data: any[] }>().subscribe(
-      response => {
-        this.specialites = response.data.map(item => item.nom);
-        console.log('Spécialités récupérées:', this.specialites);
-        this.specialiteCtrl.setValue(this.specialiteCtrl.value);
-      },
-      error => {
-        console.error('Erreur lors de la récupération des spécialités:', error);
-      }
-    );
+    // On force la mise à jour du filtre lors de l'initialisation
+    this.specialiteCtrl.setValue(this.specialiteCtrl.value);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // Si le praticien à modifier change, pré-remplir le formulaire
     if (changes['praticienToEdit'] && this.praticienToEdit) {
-      // Pré-remplissage du formulaire avec les données du praticien à modifier
       this.praticienForm.patchValue({
         nom: this.praticienToEdit.nom,
         prenom: this.praticienToEdit.prenom,
@@ -96,8 +86,12 @@ export class PraticienFormComponent implements OnInit, OnChanges {
         officiel: this.praticienToEdit.officiel,
         home: this.praticienToEdit.home
       });
-      // Pour les spécialités, on suppose ici que c'est un tableau de chaînes
-      this.selectedSpecialites = [...this.praticienToEdit.specialites.map((s: any) => s.nom || s)];
+      // On suppose ici que les spécialités sont un tableau d'objets avec propriété "nom"
+      this.selectedSpecialites = this.praticienToEdit.specialites.map(s => s.nom || s);
+    }
+    // Si la liste des spécialités (Input) change, forcer la réévaluation du filtre
+    if (changes['specialites']) {
+      this.specialiteCtrl.setValue(this.specialiteCtrl.value);
     }
   }
 
@@ -108,6 +102,7 @@ export class PraticienFormComponent implements OnInit, OnChanges {
     );
   }
 
+  // Ajoute une spécialité tapée dans l'input
   add(event: any) {
     const value = (event.value || '').trim();
     if (value && !this.selectedSpecialites.includes(value)) {
@@ -117,6 +112,7 @@ export class PraticienFormComponent implements OnInit, OnChanges {
     this.specialiteCtrl.setValue('');
   }
 
+  // Ajoute une spécialité sélectionnée dans l'autocomplete
   selected(event: any) {
     const specialite = event.option.viewValue;
     if (specialite && !this.selectedSpecialites.includes(specialite)) {

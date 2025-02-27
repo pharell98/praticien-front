@@ -4,9 +4,6 @@
     <mat-card *ngFor="let praticien of praticiens">
       <div class="praticien-header">
         <h3>{{ praticien.nom }} {{ praticien.prenom }}</h3>
-        <div class="praticien-specialite" *ngIf="praticien.specialites && praticien.specialites.length">
-          {{ praticien.specialites[0]?.nom }}
-        </div>
       </div>
 
       <div class="praticien-content">

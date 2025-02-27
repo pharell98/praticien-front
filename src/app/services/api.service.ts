@@ -54,6 +54,18 @@ export class ApiService {
       );
   }
 
+  // PUT : Met à jour un praticien par son id
+  updatePraticien<T>(data: any, id: string): Observable<T> {
+    return this.http.put<T>(`${this.baseUrl}praticiens/${id}`, data, { headers: this.getHeaders() })
+      .pipe(
+        tap(response => console.log("Réponse mise à jour praticien :", response)),
+        catchError((error) => {
+          console.error("Erreur lors de la requête PUT des praticiens :", error);
+          return throwError(() => error);
+        })
+      );
+  }
+
   // DELETE : Supprime un praticien par son id
   deletePraticien<T>(id: string): Observable<T> {
     return this.http.delete<T>(`${this.baseUrl}praticiens/${id}`, { headers: this.getHeaders() })
